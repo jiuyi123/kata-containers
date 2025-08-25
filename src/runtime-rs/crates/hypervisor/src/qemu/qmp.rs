@@ -690,6 +690,18 @@ impl Qmp {
 
         Ok(Some(pci_path))
     }
+    
+    pub fn qmp_stop(&mut self) -> Result<()> {
+        let cmd = qmp::stop {};
+        self.qmp.execute(&cmd)?;
+        Ok(())
+    }
+
+    pub fn qmp_cont(&mut self) -> Result<()> {
+        let cmd = qmp::cont {};
+        self.qmp.execute(&cmd)?;
+        Ok(())
+    }
 }
 
 fn vcpu_id_from_core_id(core_id: i64) -> String {
