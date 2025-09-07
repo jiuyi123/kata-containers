@@ -121,14 +121,17 @@ func NewVM(ctx context.Context, config VMConfig) (*VM, error) {
 	}
 
 	// 2. setup agent
+	// 返回一个空的 kataAgent{}
 	newAagentFunc := getNewAgentFunc(ctx)
 	agent := newAagentFunc()
 
+	// 这里是添加vscok的启动参数，在后续通过qemu实际添加设备
 	vmSharePath := buildVMSharePath(id, store.RunVMStoragePath())
 	err = agent.configure(ctx, hypervisor, id, vmSharePath, config.AgentConfig)
 	if err != nil {
 		return nil, err
 	}
+	//拿到agent的全部的URL
 	err = agent.setAgentURL()
 	if err != nil {
 		return nil, err
@@ -145,7 +148,8 @@ func NewVM(ctx context.Context, config VMConfig) (*VM, error) {
 			hypervisor.StopVM(ctx, false)
 		}
 	}()
-
+	
+	// 在新建 VM 之后，检查 kata agent 是否存活 的逻辑，但对模版启动的VM做了特殊处理，模版启动的虚拟机的阿根廷可能处于暂停状态，这里对于模版启动可以直接不实现
 	// 4. Check agent aliveness
 	// VMs booted from template are paused, do not Check
 	if !config.HypervisorConfig.BootFromTemplate {
@@ -326,6 +330,8 @@ func (v *VM) SyncTime(ctx context.Context) error {
 	v.logger().WithField("time", now).Infof("sync guest time")
 	return v.agent.setGuestDateTime(ctx, now)
 }
+
+
 
 func (v *VM) assignSandbox(s *Sandbox) error {
 	// add vm symlinks

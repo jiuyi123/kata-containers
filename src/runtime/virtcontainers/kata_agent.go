@@ -421,6 +421,7 @@ func (k *kataAgent) internalConfigure(ctx context.Context, h Hypervisor, id stri
 	defer span.End()
 
 	var err error
+	// 在宿主机上找到一个可用的 vsock Context ID (CID)，并返回它和对应的文件句柄。
 	if k.vmSocket, err = h.GenerateSocket(id); err != nil {
 		return err
 	}

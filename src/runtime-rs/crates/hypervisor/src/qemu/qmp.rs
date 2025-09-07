@@ -93,8 +93,10 @@ impl Qmp {
         let cmd = migrate {
             detach: None, // 同步执行迁移
             resume: None,
-            channels: None,
-            uri: Some(uri.to_string()),
+            // channels: None,
+            blk: None,
+            inc: None,
+            uri: uri.to_string(),
         };
         self.qmp.execute(&cmd)?;
         Ok(())
@@ -102,16 +104,17 @@ impl Qmp {
 
     pub fn execute_migration_incoming(&mut self, uri: &str) -> Result<()> {
         let cmd = migrate_incoming {
-            uri: Some(uri.to_string()),
-            exit_on_error: None,
-            channels:None,
+            uri: uri.to_string(),
+            // exit_on_error: None,
+            // channels:None,W
         };
         self.qmp.execute(&cmd)?;
         Ok(())
     }
-
+    #[allow(dead_code)]
     pub fn query_migration(&mut self) -> Result<MigrationInfo> {
         let cmd = query_migrate {};
+        // let cmd = query_migrate_parameters{};
         let result = self.qmp.execute(&cmd)?;
         //todo: 转换result
         info!(
@@ -269,7 +272,7 @@ impl Qmp {
                     x_use_canonical_path_for_ramblock_id: None,
                     size,
                 },
-                rom:None,
+                // rom:None,
                 align: None,
                 discard_data: None,
                 offset: None,
@@ -717,7 +720,8 @@ impl Qmp {
 
     pub fn qmp_cont(&mut self) -> Result<()> {
         let cmd = qmp::cont {};
-        self.qmp.execute(&cmd)?;
+        let resp = self.qmp.execute(&cmd)?;
+        info!(sl!(), "qmp::qmp_cont(): qmp_cont resp = {:?}", resp);
         Ok(())
     }
 }

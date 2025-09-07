@@ -685,7 +685,7 @@ func (q *qemu) CreateVM(ctx context.Context, id string, network Network, hypervi
 		HugePages:     q.config.HugePages,
 		IOMMUPlatform: q.config.IOMMUPlatform,
 	}
-
+	// 第一个用share = on, 后面是share = off，
 	incoming := q.setupTemplate(&knobs, &memory)
 
 	// With the current implementations, VM templating will not work with file
@@ -693,6 +693,8 @@ func (q *qemu) CreateVM(ctx context.Context, id string, network Network, hypervi
 	// builds the first VM with file-backed memory and shared=on and the
 	// subsequent ones with shared=off. virtio-fs always requires shared=on for
 	// memory.
+
+	// 这里go的Template不兼容virtio-fs等，但是可能要支持其他的FileBackedMemRootDir，所以做了个判断
 	if q.config.SharedFS == config.VirtioFS || q.config.SharedFS == config.VirtioFSNydus ||
 		q.config.FileBackedMemRootDir != "" {
 		if !(q.config.BootToBeTemplate || q.config.BootFromTemplate) {
@@ -700,6 +702,7 @@ func (q *qemu) CreateVM(ctx context.Context, id string, network Network, hypervi
 		} else {
 			return errors.New("VM templating has been enabled with either virtio-fs or file backed memory and this configuration will not work")
 		}
+
 		if q.config.HugePages {
 			knobs.MemPrealloc = true
 		}

@@ -1416,7 +1416,7 @@ func (s *Sandbox) startVM(ctx context.Context, prestartHookFunc func(context.Con
 			return err
 		}
 	}
-
+	//这里如果有Factory，则直接从Factory获取一个VM并通过assignSandbox与当前的Sandbox绑定起来，如果没有的话就直接走启动路径	
 	if err := s.network.Run(ctx, func() error {
 		if s.factory != nil {
 			vm, err := s.factory.GetVM(ctx, VMConfig{
@@ -1431,7 +1431,7 @@ func (s *Sandbox) startVM(ctx context.Context, prestartHookFunc func(context.Con
 			return vm.assignSandbox(s)
 		}
 
-		return s.hypervisor.StartVM(ctx, VmStartTimeout)
+		return s.hypervisor.	(ctx, VmStartTimeout)
 	}); err != nil {
 		return err
 	}
@@ -1449,6 +1449,7 @@ func (s *Sandbox) startVM(ctx context.Context, prestartHookFunc func(context.Con
 	// 3. In case of vm factory, scan the netns to hotplug interfaces after vm is started.
 	// 4. In case of prestartHookFunc, network config might have been changed. We need to
 	//    rescan and handle the change.
+	// 这里是启动后补充或者更新网络的机制，在满足网络模式和支持热插拔的前提下，如果是Factory启动（未绑定网络）或者 执着hookFunc，那就要重新启动来修改网络配置，
 	if !s.config.NetworkConfig.DisableNewNetwork &&
 		caps.IsNetworkDeviceHotplugSupported() &&
 		(s.factory != nil || prestartHookFunc != nil) {

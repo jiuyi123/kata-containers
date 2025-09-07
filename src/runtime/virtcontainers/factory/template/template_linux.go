@@ -156,6 +156,7 @@ func (t *template) createTemplateVM(ctx context.Context) error {
 	return nil
 }
 
+// 这里t.config是模版的基础配置，c是外部穿进来的配置，包含运行时信息。
 func (t *template) createFromTemplateVM(ctx context.Context, c vc.VMConfig) (*vc.VM, error) {
 	config := t.config
 	config.HypervisorConfig.BootToBeTemplate = false

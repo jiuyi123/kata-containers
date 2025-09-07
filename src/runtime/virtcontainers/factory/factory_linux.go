@@ -105,6 +105,7 @@ func (f *factory) checkConfig(config vc.VMConfig) error {
 	return checkVMConfig(baseConfig, config)
 }
 
+// 最后就是通过GetBaseVM来获取到Factory中的一个VM。
 // GetVM returns a working blank VM created by the factory.
 func (f *factory) GetVM(ctx context.Context, config vc.VMConfig) (*vc.VM, error) {
 	span, ctx := katatrace.Trace(ctx, f.log(), "GetVM", factoryTracingTags)
@@ -153,7 +154,7 @@ func (f *factory) GetVM(ctx context.Context, config vc.VMConfig) (*vc.VM, error)
 	if err != nil {
 		return nil, err
 	}
-
+Lstat
 	online := false
 	baseConfig := f.base.Config().HypervisorConfig
 	if baseConfig.NumVCPUsF < hypervisorConfig.NumVCPUsF {
